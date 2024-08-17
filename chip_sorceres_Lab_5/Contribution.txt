@@ -1,0 +1,25 @@
+Common Contributions:
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+In last Lab we're converting the sensor values to boolean and because of that our bot movement was not stable. So we updated our code and used analog values only to set the required conditions. Then the bot was working fine. Youtube link of improved Lab 3 is given in 'Readme.txt'.
+For Lab 4 we done changes in improved version of Lab 3 and added some more functionalities like transistioning from white line to black line and then controlling the movement on black line and the parking the bot in vacant space.
+ In this lab,we just added remote controller code
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Individual Contributions per member
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Suchit Meshram(23M0814) : 
+--------------------------
+	Worked on finding the optimal velocity for taking turns. 
+	initialized direction and calculated left and right velocity on the basis of direction.
+	Calculated the optimal value of K_P, K_I and K_D constants.
+--------------------------
+Giriraj Singh (23M0815) :
+--------------------------
+	Implemented code for taking turns on black line and counted the no. of nodes to reach parking place.
+	Implemented code for controlling the movement on black line.
+	Implemented the heptagon code for parking using IR sensors.
+--------------------
+Sweta (23D0382) :
+--------------------
+	Implemented the transistion from white line to black line.
+	Created logic for using reset counter to find the empty space for parking.
+	Did all the wiring for the IR sensors in alphabot.

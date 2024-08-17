@@ -1,0 +1,140 @@
+const kp: int = 3
+const kd: int = 1
+const ki: int = 0
+const thresh: int  = 800
+node line_follower(sen: int^5;left_ir, right_ir, node_counter:int) returns (v_l, v_r, dir,st: int)
+var 
+    error:int;
+    temp_pid, pidvalue: int; 
+    p,i,d: int;
+let
+    automaton
+    state Whiteline
+    do
+    error = (sen[1] + sen[0]) - (sen[3]+sen[4]) ;
+    p = error;
+	i = 0 -> ( pre(i) + error);
+	d = error - ( 0 -> pre(error));
+	temp_pid = (p * kp) + (i * ki) + (d * kd);
+    
+    pidvalue = if (temp_pid < 0) then -15 else 15;
+    st = 1;          
+    
+    dir = if ((sen[0] > 850) ) then 4 else
+          if ((sen[4] > 850)) then 5 else
+          if (sen[1] > 850) then 2 else 
+          if (sen[3] > 850) then 3 else
+          1;
+    
+    v_l = if (dir = 0) then 0 else
+          if (dir = 2) then (70 + pidvalue) else
+          if (dir = 3) then 0 else
+          if (dir = 4) then 30 else
+          if (dir = 5) then 90 else
+          40;
+    
+    v_r = if (dir = 0) then 0 else
+          if (dir = 2) then 0 else
+          if (dir = 3) then (70 + pidvalue) else
+          if (dir = 4) then 90 else
+          if (dir = 5) then 30 else
+          40;
+    unless sen[0]>800 & sen[1]>800 & sen[2]<800 & sen[3]<800 & sen[4]>800 then Blackline
+    
+    state Blackline
+    do
+      error = (sen[1]*2 + sen[0]) - (sen[3]*2 + sen[4]) ;
+      p = error;
+	i = 0 -> ( pre(i) + error);
+	d = error - ( 0 -> pre(error));
+	temp_pid = (p * kp) + (i * ki) + (d * kd);
+    
+      pidvalue = if (temp_pid < 0) then -15 else 15;
+              
+    st=2;
+    dir = if ((sen[0] < 550) ) then 4 else
+          if ((sen[4] < 800)) then 5 else
+          if (sen[1] < 800) then 2 else 
+          if (sen[3] < 800) then 3 else
+          1;
+    
+    v_l = if (dir = 6) then 60 else
+          if (dir = 2) then (60 + pidvalue) else
+          if (dir = 3) then 0 else
+          if (dir = 4) then 30 else
+          if (dir = 5) then 90 else
+          40;
+    
+    v_r = if (dir = 6) then 60 else
+          if (dir = 2) then 0 else
+          if (dir = 3) then (60 + pidvalue) else
+          if (dir = 4) then 90 else
+          if (dir = 5) then 30 else
+          40;
+    unless node_counter=4 then Parking
+
+    state Parking
+    do
+      error = 0;
+      temp_pid = 0;
+      pidvalue = 0;
+       p = 0;
+       i= 0;
+       d = 0;
+      automaton
+            state Line_Follow
+            var left_timer, right_timer:int;
+                  do
+                        dir = if (sen[1] < 800) then 2 else 
+                              if (sen[3] < 800) then 3 else
+                              1;
+                        
+                        v_l = if (dir = 2) then 40 else
+                              if (dir = 3) then 10 else
+                              40;
+
+                        v_r = if (dir = 2) then 10  else
+                              if (dir = 3) then 40 else
+                              40;
+                        st = 3;
+                        reset 
+                              left_timer = 0 -> pre(left_timer) + 1;
+                        every (left_ir = 0);
+
+                        reset 
+                              right_timer = 0 -> pre(right_timer) + 1;
+                        every (right_ir = 0);
+            until left_timer > thresh  then Park_left
+                  |  right_timer > thresh then Park_right
+
+            state Park_left
+            do
+                  dir = 7;
+                  v_l = if (sen[0]>500 & sen[1] > 500 & sen[2]>500 & sen[3] >500 & sen[4]>500) then 0 
+                        else 25;
+                  v_r = if (sen[0]>500 & sen[1] > 500 & sen[2]>500 & sen[3] >500 & sen[4]>500) then 0
+                        else 50;
+                  st = 4;
+
+            state Park_right
+            do
+                  dir = 9;
+                  v_l = if (sen[0]>500 & sen[1] > 500 & sen[2]>500 & sen[3] >500 & sen[4]>500) then 0 
+                        else 50;
+                  v_r = if (sen[0]>500 & sen[1] > 500 & sen[2]>500 & sen[3] >500 & sen[4]>500) then 0
+                        else 25;
+                  st = 5;
+      end;
+    end;
+tel
+
+
+node main(sen0, sen1, sen2, sen3, sen4, left_ir, right_ir, node_counter: int) returns (v_l, v_r, dir, st: int)
+var sen: int^5;
+let
+	sen = [sen0, sen1, sen2, sen3, sen4];
+	(v_l, v_r, dir, st) = line_follower(sen,left_ir,right_ir,node_counter);
+tel
+
+
+
